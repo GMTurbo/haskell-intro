@@ -246,3 +246,49 @@ str = show (read "123") -- read converts but requires a type
 
 --THIS WORKS
 str = show (read "123" :: Int)
+
+
+------- Polymorphic Functions ------
+-- NOT OBJECT ORIENTED POLYMORPHISM --
+-- MORE SIMILIAR TO C# GENERICS OR TEMPLATES--
+
+:t length
+length = [a] -> Int --[a] implied it can handle different types of arrays
+--length is polymorphic
+
+length' [] = []
+length' (x:xs) = length xs + 1
+
+--type variables - start lowercase
+-- a, b, x, foo, hello_123
+
+--Concrete types - start Uppercase
+-- Int, Integer, Char, Double
+
+:t head -- polymorphic
+head :: [a] -> a
+
+head' nums = case nums of
+   []     -> error "empty list"
+   (x:xs) -> x
+
+--compile rejects this
+badHead :: [a] -> b
+badHead (x:xs) -> x
+
+---- Type Class Constaints ----
+
+badSum :: [a] -> a -- this says any type can be summed
+ -- which isn't true
+badSum nums = case nums of
+    []    -> 0
+    (x:xs)-> x + (sum xs)
+
+-- this sums any array of type num
+--   and returns the concrete type
+-- => indicates a constraint (type Numeric)
+goodSum :: Num a => [a] -> a
+
+goodSum nums = case nums of
+    []    -> 0
+    (x:xs)-> x + (sum xs)
