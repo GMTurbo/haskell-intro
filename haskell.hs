@@ -203,3 +203,46 @@ map ($3) [(+1), (\x-> 2*x + 3), (*2)] -- [4,9,6]
 zipWith ($) [(+1), (\x-> 2*x + 3), (*2)] [1,2,3] --[2,7,6]
 
 ---------------------- TYPES ------------------
+
+foo x = x + 1
+:t foo -- foo :: Num a => a -> a
+
+foo x y z = x + y + z
+:t foo -- foo :: Num a => a -> a -> a -> a
+
+let x = 3 :: Int
+
+-- it can be dangerous to type things yourself sometime
+-- you can cause errors
+-- for example
+y = (3 :: Int) + (2.1 :: Double) -- can't add int to double
+
+------- Type Inference ------
+
+square x = x * x -- compiler infers x is a number
+
+squareTwice x = square (square x) -- infers return type of square as number
+
+-- can't concate a number to a string
+brokenShowSquare x = "this is the value of square x: " ++ square x
+
+workingShowSquare x = "this is the value of square x: " ++ show (square x )
+
+-- Explicit typing is used more for readability
+-- and communicating with people
+
+-- YOU MOST LIKELY WILL NEVER NEED TO EXPLICITLY TYPE THINGS
+
+-- tells us the function takes a string and returns an Int
+mystery :: [Char] -> Int
+
+-- this will error out
+whats_wrong = x + y
+    where x = length "hello"
+          y = 6/2
+
+-- THIS DOESNT WORK
+str = show (read "123") -- read converts but requires a type
+
+--THIS WORKS
+str = show (read "123" :: Int)
