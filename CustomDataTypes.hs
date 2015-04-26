@@ -35,3 +35,6 @@ newtype CustomerId = MakeCustomerId Int
 
 customer :: CustomerId
 customer = MakeCustomer 13
+
+customerToInt :: CustomerId -> Int
+customerToInt (MakeCustomerId i) = i
