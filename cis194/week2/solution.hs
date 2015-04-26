@@ -45,9 +45,17 @@ parseMessage message
   | otherwise = Unknown message
 
 parse :: String -> [LogMessage]
-parse str = map parseMessage entries
+parse str = map parseMessage2 entries
    where entries = (lines str) --filter (\s -> head (head s) =="E")
 
+parseMessage2 :: String -> LogMessage
+parseMessage2 str =
+    let wordlist = words str in
+     case wordlist of
+      ("I":ts:msg) -> LogMessage Info (read ts :: Int) (unwords msg)
+      ("W":ts:msg) -> LogMessage Warning (read ts :: Int) (unwords msg)
+      ("E":lvl:ts:msg) -> LogMessage (Error (read lvl :: Int)) (read ts :: Int) (unwords msg)
+      (_) -> Unknown (unwords wordlist)
 
 -- Exercise 2
 
