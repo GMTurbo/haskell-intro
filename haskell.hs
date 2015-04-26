@@ -309,8 +309,6 @@ showSum x = show (sum x)
 -- :t 3 -- Num a => a
 -- :t 3.1 -- Fractional a => a
 
-
-
 parseRest :: String -> (Int, String)
 parseRest str =
   let [(t, rest)] = words str

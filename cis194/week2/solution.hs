@@ -46,17 +46,14 @@ parseMessage message
 
 parse :: String -> [LogMessage]
 parse str = map parseMessage entries
-   where entries = (lines str) --filter (\s -> head (head s) =="E") 
-  -- parseMessage message
-  --   | checkFirst(head (words message)) =
-  --        let logType = getLogType message
-  --            shrunk = tail(words message)
-  --            rest = parseRest(unwords shrunk)
-  --            timestamp = fst rest
-  --            last = snd rest
-  --          in case logType of
-  --            Error (x)-> let timestamp2 = (read (head (words last)) :: Int)
-  --                            last2 = unwords(tail (words last))
-  --                         in LogMessage logType timestamp2 last2
-  --            (_) -> LogMessage logType timestamp last
-  --   | otherwise = Unknown message
+   where entries = (lines str) --filter (\s -> head (head s) =="E")
+
+
+-- Exercise 2
+
+-- inserts a new LogMessage into an existing MessageTree, producing
+-- a new MessageTree
+-- insert :: LogMessage -> MessageTree -> MessageTree
+-- insert log tree = case log of
+--   Unknown -> tree
+--   (_) -> let
