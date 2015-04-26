@@ -204,6 +204,12 @@ zipWith ($) [(+1), (\x-> 2*x + 3), (*2)] [1,2,3] --[2,7,6]
 
 ---------------------- TYPES ------------------
 
+function x(arr){
+  if(arr.length > 0)
+  switch(arr[0]){
+
+  }
+}
 foo x = x + 1
 :t foo -- foo :: Num a => a -> a
 
@@ -292,3 +298,21 @@ goodSum :: Num a => [a] -> a
 goodSum nums = case nums of
     []    -> 0
     (x:xs)-> x + (sum xs)
+
+-- you can have multiple constraints
+showSum :: (Num a, Show a) => [a] -> [Char]
+-- Show Type Class just means show can
+--  be called on it (it has a string representation)
+
+showSum x = show (sum x)
+
+-- :t 3 -- Num a => a
+-- :t 3.1 -- Fractional a => a
+
+
+
+parseRest :: String -> (Int, String)
+parseRest str =
+  let [(t, rest)] = words str
+  in
+   (read t :: Int, rest)

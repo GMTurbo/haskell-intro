@@ -1,3 +1,5 @@
+import Data.Char (isSpace)
+
 head' :: [a] -> a
 
 head' nums = case nums of
@@ -24,3 +26,14 @@ goodSum :: Num a => [a] -> a
 goodSum nums = case nums of
     []    -> 0
     (x:xs)-> x + (sum xs)
+
+-- you can have multiple constraints
+showSum :: (Num a, Show a) => [a] -> [Char]
+showSum x = show (sum x)
+
+
+parseRest :: String -> (Int, String)
+parseRest str =
+  let [(t, rest)] = lex str
+  in
+   (read t :: Int, dropWhile isSpace rest)
