@@ -138,3 +138,71 @@ heirarchy = StringTree "C:"
                [StringTree "Alice" []]
             , StringTree "Cats" []
             ]
+
+-- ADT can have multiple constructors
+data bool = False | True
+
+x::Bool
+x = False
+y::Bool
+y = True
+
+-- pattern matching
+negate :: Bool -> Bool
+negate True = False
+negate False = True
+
+-- haskell enum equivalent
+data DialogResponse = Yes | No | Help | Quit
+
+-- nullable equivalent in haskell
+data MaybeInt = NoInt | JustInt Int
+
+defaultInt :: Int -> MaybeInt -> Int
+defaultInt defaultValue NoInt = defaultValue -- NoInt so use default
+defaultInt _ (JustInt x) = x -- MaybeInt with value, so return that
+
+let val = defaultInt 10 NoInt -- result 10
+let val = defaultInt 10 (JustInt 5) -- result 5
+
+data StringList = EmptyStringList
+                  | ConsStringList String {-|head|-} StringList {-|tail|-}
+
+lengthStringList :: StringList -> Int
+lengthStringList EmptyStringList = 0
+lengthStringList (ConsStringList _ rest) = 1 + length rest
+
+
+-- Parameterized Types --
+
+--Maybe from std lib
+data Maybe a = Just a | Nothing
+-- this means that when supplied a type, you get a Maybe type back
+
+x :: Maybe Int
+x = Nothing
+
+--takes default value of a, and a maybe type of a and returns a
+fromMaybe :: a -> Maybe a -> a
+fromMaybe defaultVal Nothing = defaultVal
+fromMaybe _ (Just x) = x
+
+--std list type
+data List a = Empty | Cons a (List a)
+--Cons take head of list and then tail as args
+
+--Parameterized type can also take multiple type parameters
+data Map k a = ...
+
+-- NOTE: Parameterized Type allow you to create types that can
+--       hold any other type.  They hold values of any type.
+--       Like generic lists and dictionaries
+
+-- Type Class Instances
+
+elem _ [] = False -- handle empty case
+elem x (y : ys)   -- handle list
+  | x == y    = True -- head == target
+  | otherwise = elem x ys -- recurse to continue search
+  
+  
