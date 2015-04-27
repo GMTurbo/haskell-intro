@@ -206,3 +206,24 @@ elem _ [] = False -- handle empty case
 elem x (y : ys)   -- handle list
   | x == y    = True -- head == target
   | otherwise = elem x ys -- recurse to continue search
+
+
+data RGB = RGB Int Int Int
+
+colors = [RBG 255 0 0, RGB 0 255 0, RGB 0 0 255]
+green = RGB 0 255 0
+greenInColors = elem green colors -- this won't work because RBG is
+                                  --  not in the Eq Type Class
+
+-- to put RGB in the Eq TypeClass we have to use instance
+instance Eq RGB where
+  (RGB r1 g1 b1) == (RGB r2 g2 b2) =
+    (r1 == r2) && (g1 == g2) && (b1 == b2)
+
+show RGB -- Doesn't work because it doesn't know how to represent
+         -- itself as a string
+
+instance Show RGB where
+  show (RGB r g b) =
+    "RGB " ++ (show r) ++ " " ++ (show g) ++ " " ++ (show b)
+    
