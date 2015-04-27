@@ -96,3 +96,45 @@ data Customer = Customer extends Person {luckyNumber :: Int}
 data Customer = Customer { name::String {-|same-}, customerId :: CustomerId }
 data Supplier = Supplier { name::String {-|same-}, supplierId :: SupplierId }
 --both have name definition, so it breaks... wow that sucks
+
+
+-- ALGEBRAIC DATA TYPES
+---- Workhorse of haskell types
+
+-- data keyword, name of type, = constructor name, type of args to constructor
+data Customer = MakeCustomer CustomerId String Int
+
+--common pattern in haskell to name type and constructor the same thing
+data Customer = Customer CustomerId String Int
+
+--newtype
+newtype CustomerId = CustomerId Int
+
+-- NOTE: algebraic data types and newtype only differ by
+--       the amount of arguments you can create them with.
+--       newtype -> only 1 constructor argument
+--       adt -> multiple constructor arguments
+
+--Create algebraic type
+alice::Customer
+alice = Customer (CustomerId 13) "Alice" 69
+
+--extrac value from adt using pattern matching
+getCustomerId :: Customer -> CustomerId
+getCustomerId (Customer cust_id name luckyNumber {-|pattern matches a customer|-})
+  = cust_id
+
+--easier to wildcard parts you don't care about
+getCustomerId :: Customer -> CustomerId
+getCustomerId (Customer cust_id _ _) = cust_id
+
+-- a tree structure
+data StringTree = StringTree String [StringTree]
+
+--example of tree
+heirarchy = StringTree "C:"
+            [ StringTree "Program Files" []
+            , StringTree "Users"
+               [StringTree "Alice" []]
+            , StringTree "Cats" []
+            ]
