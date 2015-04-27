@@ -200,9 +200,9 @@ data Map k a = ...
 
 -- Type Class Instances
 
+--Eq is required for elem to know how to compare
+elem :: Eq a => a -> [a] -> Bool
 elem _ [] = False -- handle empty case
 elem x (y : ys)   -- handle list
   | x == y    = True -- head == target
   | otherwise = elem x ys -- recurse to continue search
-  
-  
