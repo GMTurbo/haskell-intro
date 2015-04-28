@@ -226,4 +226,135 @@ show RGB -- Doesn't work because it doesn't know how to represent
 instance Show RGB where
   show (RGB r g b) =
     "RGB " ++ (show r) ++ " " ++ (show g) ++ " " ++ (show b)
-    
+
+-- Type Class Instances for Parameterized Types
+data Maybe' a = Nothing' | Just' a
+
+--instance with a context
+instance (Eq a) => Eq (Maybe' a) where
+  Nothing' == Nothing' = True
+  Nothing' == (Just' _) = False
+  (Just' _) == Nothing' = False
+  (Just' x) == (Just' y) = x == y
+
+-- DERIVING TYPE CLASS INSTANCES
+
+data RGB = RGB Int Int Int
+
+instance Eq RGB where
+  (RGB r1 g1 b1) == (RGB r2 g2 b2) =
+    (r1 == r2) && (g1 == g2) && (b1 == b2)
+
+data Person = Person String Int Int
+
+instance Eq Person where
+  (Person name1 age1 height1) ==
+    (Person name2 age2 height2) =
+      (name1 == name2) && (age1 == age2) && (height1 == height2)
+
+-- Eq instance gets tedious
+
+data RGB = RGB Int Int Int
+  deriving Eq -- gives obvious comparison method
+
+data Person = Person String Int Int
+  deriving Eq
+
+--Useful Deriving Types
+-- *Eq
+-- -> Deriving - component-wise equality
+-- *Ord
+-- -> (<),(>),(<=), (>=)
+-- -> Deriving - component-wise comparison
+-- *Show
+-- -> show
+-- -> Deriving -"{Constructor-Name} {arg1} {arg2} ..."
+-- *Read
+-- -> read
+-- -> Deriving - parse output of default show
+
+-- DEFINING Type Classes
+
+--Eq implementation
+class Eq a where
+  (==) :: a -> a -> Bool --equal
+  (/=) :: a -> a -> Bool --not equal
+
+data Point2 = Point2 Double Double
+
+distance2 :: Point2->Point2->Double
+distance2 (Point2 x1 y1) (Point2 x2 y2)
+ sqrt (dx * dx + dy * dy)
+   where dx = x1 - x2
+         dy = y1 - y2
+
+data Point3 = Point3 Double Double Double
+
+distance3 :: Point3 -> Point3 -> Double
+distance3 (Point3 x1 y1 z1) (Point3 x2 y2 z2)
+  sqrt (dx*dx+dy*dy+dz*dz)
+  where dx = x1 - x2
+        dy = y1 - y2
+        dz = z1 - z2
+
+pathLength2 :: [Point2] -> Double
+pathLength2 num = case num of
+  []         -> 0
+  (_:[])     -> 0
+  (p1:p2:ps) -> distance2 p1 p2 + pathLength2 p1:ps
+
+pathLength3 :: [Point3] -> Double
+pathLength3 num = case num of
+  []         -> 0
+  (_:[])     -> 0
+  (p1:p2:ps) -> distance3 p1 p2 + pathLength p1:ps
+
+class Measurable a where
+  distance :: a -> a -> Double
+
+instance Measurable Point2 where
+  distance = distance2
+
+instance Measurable Point3 where
+  distance = distance3
+
+--Now we can write a polymorphic pathlength function
+--  that works for both Point2 and Point3
+
+pathLength :: Measurable a => [a] -> Double
+pathLength2 num = case num of
+  []         -> 0
+  (_:[])     -> 0
+  (p1:p2:ps) -> distance p1 p2 + pathLength2 p1:ps
+
+-- Subclasses of Type Classes
+
+data Point2 = Point2 Double Double deriving Show
+data Point3 = Point3 Double Double Double deriving Show
+
+class Measurable a where
+  distance :: a -> a -> Double
+
+-- Make Directions a subclass of both Measurable and Show
+-- this means that a must be of type Measurable and Show
+class (Measurable a, Show a) => Directions a where
+  getDirections :: a -> a -> String
+  getDirections p1 p2 =
+    "Go from " ++ (show p1) ++ --showable
+    " towards" ++ (show p2) ++
+    " and stop after " ++ (show (distance p1 p2)) -- and measurable
+
+instance Directions Point3 where
+  getDirections p1 p2 =
+    "Fly from " ++ (show p1) ++ --showable
+    " towards" ++ (show p2) ++
+    " and stop after " ++ (show (distance p1 p2)) -- and measurable
+
+instance Direction Point2 where -- empty declaration required
+
+---------------- SUMMARY ----------------
+
+-- Instances
+-- Deriving
+-- Defining type classes
+-- Subclasses
