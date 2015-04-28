@@ -76,3 +76,60 @@ main :: IO ()
 main = do
   introduce "Alice" "Bob"
   introduce "Alice" "Sally"
+
+---------- IO Values ----------
+
+main :: IO ()
+main = do
+  line <- getLine
+  putStrLn ("You said: " ++ line)
+
+--input: blah blah blah
+--output: You said: blah blah blah
+
+:t getLine
+-- result: getLine :: IO String
+
+greet::IO ()
+greet = do
+  putStrLn "Who are you?"
+  who <- getLine
+  putStrLn ("Hello " ++ who)
+
+greetForever :: IO ()
+greetForever = do
+  greet
+  greetForever
+
+main :: IO ()
+main = greetForever
+
+---------- return Function ----------
+-- useful for combining multiple IO values
+
+dummyGetLine :: IO String
+dummyGetLine =
+  return "I'm not really doing anything"
+
+main :: IO ()
+main = do
+  line <- dummyGetLine
+  putStrLn line
+
+return :: a -> IO a
+
+--returning multiple IO values
+
+promptInfo :: IO (String, String)
+promptInfo = do
+  putStrLn "What is your name?"
+  name <- getLine
+  putStrLn "What is your favorite color?"
+  color <- getLine
+  return (name, color)
+
+main :: IO ()
+main = do
+  (name, color) <- promptInfo
+  putStrLn ("Hello " ++ name)
+  putStrLn ("I like " ++ color ++ " too!")
