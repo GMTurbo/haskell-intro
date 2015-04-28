@@ -181,23 +181,17 @@ main = interact reverseLines
 --simple shift encryption
 encrypt :: Char -> Char
 encrypt c
- | 'A' <= c && c <'Z' =
+ | 'A' <= c && c <'Z' | 'a' <= c && c <'z' =
       toEnum (fromEnum c + 1) -- a->b, c->d etc
- | 'a' <= c && c <'z' =
-      toEnum (fromEnum c + 1) -- a->b, c->d etc
- | c == 'Z' = 'A' -- wrap z
- | c == 'z' = 'a' -- wrap z
+ | c == 'Z' | c == 'z'= 'A'  -- wrap z
  | otherwise = c
 
 -- decrypt
 decrypt :: Char -> Char
 decrypt c
-  | 'A' <= c && c <'Z' =
+  | 'A' <= c && c <'Z' | 'a' <= c && c <'z' =
        toEnum (fromEnum c - 1) -- a->b, c->d etc
-  | 'a' <= c && c <'z' =
-       toEnum (fromEnum c - 1) -- a->b, c->d etc
-  | c == 'A' = 'Z' -- wrap z
-  | c == 'a' = 'z' -- wrap z
+  | c == 'A' | c == 'a'= 'Z' -- wrap z
   | otherwise = c
 
 main :: IO ()
