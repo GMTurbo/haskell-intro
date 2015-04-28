@@ -126,10 +126,79 @@ promptInfo = do
   name <- getLine
   putStrLn "What is your favorite color?"
   color <- getLine
-  return (name, color)
+  return (name, color) -- needs to return an IO Action
 
 main :: IO ()
 main = do
-  (name, color) <- promptInfo
+  (name, color) <- promptInfo -- pattern matching
   putStrLn ("Hello " ++ name)
   putStrLn ("I like " ++ color ++ " too!")
+
+-- combining
+
+main :: IO ()
+main = do
+  line1 <- getLine
+  line2 <- getLine
+  let lines = line1 ++ line2
+  putStrLn lines
+
+-- return doesn't stop program from running
+-- return doesn't do anything to control flow
+main :: IO ()
+main = do
+  return 0 -- just a function that creates an IO Action
+  putStrLn "haha, still running"
+  return "halt!"
+  putStrLn "you can't stop me!"
+
+
+-------- Some Useful IO Actions --------
+
+putStrLn :: String -> IO ()
+getLine :: IO String
+print :: (Show a) => a -> IO () -- type must have a string rep (Show Type Class)
+readFile :: FilePath -> IO String
+-- Read an entire file as a (lazy) string
+--  so you only ever evaluate parts you use
+writeFile :: FilePath -> String -> IO ()
+-- FilePath is just a type synonym for String
+appendFile :: FilePath -> String -> IO ()
+
+interact :: (String -> String) -> IO ()
+-- takes an arg that maps a string to a string
+
+reverseLines :: String -> String
+reverseLines input =
+  unlines (map reverse (lines input))
+
+main :: IO ()
+main = interact reverseLines
+
+-------- Program Organization --------
+-- Do as little IO as possible
+
+--simple shift encryption
+encrypt :: Char -> Char
+encrypt c
+ | 'A' <= c && c <'Z' =
+      toEnum (fromEnum c + 1) -- a->b, c->d etc
+ | 'a' <= c && c <'z' =
+      toEnum (fromEnum c + 1) -- a->b, c->d etc
+ | c == 'Z' = 'A' -- wrap z
+ | c == 'z' = 'a' -- wrap z
+ | otherwise = c
+
+-- decrypt
+decrypt :: Char -> Char
+decrypt c
+  | 'A' <= c && c <'Z' =
+       toEnum (fromEnum c - 1) -- a->b, c->d etc
+  | 'a' <= c && c <'z' =
+       toEnum (fromEnum c - 1) -- a->b, c->d etc
+  | c == 'A' = 'Z' -- wrap z
+  | c == 'a' = 'z' -- wrap z
+  | otherwise = c
+
+main :: IO ()
+main = interact (map (encrypt . decrypt . encrypt))
