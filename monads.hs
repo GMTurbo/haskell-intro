@@ -274,3 +274,89 @@ sum' [1,1,1,1,1,1,1]
 -- High Performance
 -- Translating imperative code
 -- Complicated, multi-part state
+
+import Control.Monad
+
+-------- Monadic Flow Control --------
+-- Analogous with imperative flow control constructs
+-- Actually just ordinary functions
+
+---- forM ----
+-- equivalent to ForEach --
+forM :: Monad m => [a] -> (a -> m b) -> m [b]
+
+--forM version if you want to disregard the result
+forM_ :: Monad m => [a] -> (a -> m b) -> m ()
+
+forM list $ do
+  x <- first_action
+  second_action
+  ...
+
+forM [1,2,3] print
+--1
+--2
+--3
+
+replicateM  :: Monad m => Int -> m a -> m [a]
+replicateM_ :: Monad m => Int -> m a -> m ()
+
+replicateM 3 (putStrLn "hello")
+--hello
+--hello
+--hello
+
+when :: Monad m => Bool -> m () -> m ()
+
+when debug (putStrLn "Debugging") -- prints Debugging if debug is true
+
+---- Lifting: liftM ----
+
+liftM :: Monad m => (a -> b) -> (m a -> m b)
+
+liftM (1+) (Just 3)
+--RESULT: Just 4
+
+liftM2 :: Monad m =>
+            (a1->a2->b) -> m a1 -> m a2 -> m b
+liftM3 :: ...
+liftM4 :: ...
+liftM5 :: ...
+
+liftM2 (+) (Just 3) (Just 5)
+--RESULT: Just 8
+
+mapM :: Monad m => (a -> m b) -> [a] -> m [b]
+forM :: Monad m => [a] -> (a -> m b) -> m [b] -- args reversed
+
+mapM print [1,2,3]
+--1
+--2
+--3
+
+filterM :: Monad m => (a -> m Bool) -> [a] -> m [a]
+
+askToKeep :: Int -> IO Bool
+askToKeep x = do
+  putStrLn ("keep " ++ (show x) ++ "?")
+  (c : _) <- getLine
+  return (c == 'y')
+
+askWhichToKeep :: [Int] -> IO [Int]
+askWhichToKeep xs =
+  filterM askToKeep xs
+
+
+foldM :: Monad m => (a -> b -> m a) ->
+                     a -> [b] -> m a
+
+sayAddition :: Int -> Int -> IO Int
+sayAddition x y = do
+  let z = x + y
+  putStrLn ((show x) ++ " + " ++
+            (show y) ++ " = " ++
+            (show z))
+  return z
+
+talkingSum :: [Int] -> IO Int
+talkingSum xs = foldM sayAddition 0 xs
