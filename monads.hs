@@ -148,3 +148,129 @@ missing
 --,"eve lost a car"
 --,"eve lost a puppy"
 --]
+
+
+-------- Common Monads --------
+
+-- Reader
+-- State
+-- ST
+
+---- Reader Monad ---
+-- used to represent computations that need access to some context value
+-- like the name of the current user
+
+import Control.Monad.Reader
+
+data Reader r a
+-- r = type of context value which can be read within the reader monad
+-- a = result of reader computation
+
+instance Monad (Reader r)
+
+ask :: Reader r r
+
+runReader :: Reader r a -> r -> a
+
+getFirst :: Reader String String
+getFirst = do
+  name <- ask -- get name from Reader Monad
+  return (name ++ " woke up") -- repackaged into Reader Monad
+getSecond :: Reader String String
+getSecond = do
+  name <- ask -- get name from Reader Monad
+  return (name ++ " wrote some haskell") -- repackaged into Reader Monad
+getStory :: Reader String String
+getStory = do
+  first <- getFirst
+  second <- getSecond
+  return ("First, " ++ first ++
+          ".  Second, " ++ second ++ ".")
+story = runReader getStory "Gabe"
+
+story
+--Result: "First, Gabe woke up.  Second, Gabe wrote some haskell"
+
+---- State Monad ---
+-- used to write code that requires state that could change during computation
+
+import Control.Monad.State
+
+data State s a
+-- s = type of state
+-- a = type of result
+
+get :: State s s
+put :: s -> State s () -- () result type is Unit
+evalState :: State s a -> s -> a
+
+harmonicStep :: State (Double, Double) Double
+harmonicStep = do
+  (position, velocity) <- get --get current state
+  let acceleration = (-0.01 * position)
+      velocity'    = velocity + acceleration
+      position'    = position + velocity'
+  put (position', velocity') -- put new position and velocity back
+  return position
+
+harmonic :: State (Double, Double) [Double]
+harmonic = do
+  position <- harmonicStep
+  laterPositions <- harmonic -- infinite list, but no problem in haskell
+  return (position : laterPositions)
+
+let position = evalState harmonic (1,0)
+take 4 positions
+--Result:
+--[1.0,
+-- 0.99,
+-- 0.9701,
+-- 0.940499]
+
+newtype State s a = State (s -> (a, s))
+
+---- ST Monad ---
+-- fancy State Monad
+-- Implement imperative algorithms
+-- Modifiable values
+-- Pure from the outside
+
+import Control.Monad.ST
+
+data ST s a
+-- a = result type of computation
+-- s = ignore for ST Monad
+
+instance Monad (ST s)
+
+runST :: ST s a -> a -- returns boxed value
+
+-- you need a special value to use with ST
+import Data.STRef
+
+data STRef s a
+
+newSTRef :: a -> ST s (STRef s a)
+readSTRef :: STRef s a -> ST s a
+writeSTRef :: STRef s a -> a -> ST s ()
+
+sumST :: [Int] -> STRef s Int -> ST s ()
+sumST []     accumRef = return ()
+sumST (x:xs) accumRef = do
+  accum <- readSTRef accumRef
+  writeSTRef accumRef (x + accum)
+  sumST xs accumRef
+
+sum' :: [Int] -> Int
+sum' xs = runST $ do
+  accumRef <- newSTRef 0
+  sumST xs accumRef
+  readSTRef accumRef
+
+sum' [1,1,1,1,1,1,1]
+--RESULT: 6
+
+---- ST MONAD USES
+-- High Performance
+-- Translating imperative code
+-- Complicated, multi-part state
